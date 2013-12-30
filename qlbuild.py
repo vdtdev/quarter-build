@@ -1,38 +1,69 @@
 """ Quarter-Life Build
-	v0.2.20120929
+	v0.2.20131229
 	by Wade Harkins <vdtdev@gmail.com>"""
-
+import textwrap
 import argparse
 import string
-
+import time
+import sys
+from os import path
 # command names from batch version
-__commands__ = ["getMaterials","putMaterials","getAssets","putAssets","build_materials"]
+__commands__=[['get','materials'],['get','assets'],['put','materials'],
+				['put','assets'],['build','materials']]
+__actions__=['get','put','build']
+__targets__=['materials','assets']
+__asset_args__=['U','C','N','A']
 __parser__ = None
+__arguments__=None
 cfg = None
 
 def __startup__():
-	parser = argparse.ArgumentParser(description='Quarter-Life Build System (QLBS) v0.2')
-	parser.add_argument('tool',default='noargs',
-						help='name of tool to invoke',action='store')
-	parser.add_argument('args',nargs='*',help='tool arguments',action='store')
-	args = parser.parse_args(['tool','args'])
-	
+	parser = argparse.ArgumentParser(description='Quarter-Life Build System (QLBS) v0.2',
+			epilog=textwrap.dedent('''Valid Tool Arguments:
+	U	Copy only updated files
+	C	Copy only changed files
+	N	Copy only new files
+	A	Copy all (default)'''),
+			formatter_class=argparse.RawDescriptionHelpFormatter)
+	parser.add_argument('action',metavar='action',choices=__actions__,
+						help='Tool action (get, set, build)')
+	parser.add_argument('target',metavar='target',choices=__targets__,
+						help='Content type to target (assets, materials)')
+	parser.add_argument('--args',dest='args',choices=__asset_args__,
+						help='Arguments to pass to tool',action='store',required=False)
+	# exit if no arguments were passed, or just one
+	if len(sys.argv)==1 or len(sys.argv)==2:
+		parser.print_help()
+		exit(0)
+		
+	args = parser.parse_args()
 	arg=vars(args)
-	if arg.has_key("tool"):
-		if not arg['tool'] in __commands__:
-			parser.print_help()
-			exit(0)
-	run_tool(arg)
+	run_tool(arg,args)
 
 def run_tool(arg,args):
 	""" Execute tool indicated in the commandline, or show help """
 	cfg=config('qlbs.ini')
-	if arg['tool']=='build_materials':
-		build_materials(arg['tool_args'])
+	__arguments__=arg
+	if arg['target']=='materials':
+		# Material actions
+		if arg['action']=='build':
+			# Build materials
+			build_materials(arg['tool_args'])
+			exit(0)
+			
+	if arg['target']=='assets':
+		cmd = [arg['action'],arg['target']]
+		# Asset actions
+		if arg['action']=='get':
+			tool = asset_management(cfg,cmd)
+			tool.execute
+			exit(0)
+		if arg['action']=='put':
+			tool = asset_management(cfg,cmd)
+			tool.execute
+			exit(0)
+		print ("Invalid action provided")
 		exit(0)
-	if arg['tool']=="getAssets" or arg['tool']=="putAssets":
-		tool = asset_management(cfg,arg['tool'])
-		exit(0);
 
 class config:
 	""" Read a dictionary of settings from a file on disk """
@@ -71,16 +102,21 @@ def build_materials(path):
 	os.system('mkdir ' + dst2)
 	os.system('mkdir ' + src2)
 	shutil.copy(mat_src + '*.vmt',dst_root)
-	shutil.copy(src2 + '\\*.vmt',dst2)
-	shutil.copy(src2 + '\\*.vmt',dst2)
+	shutil.copy(src2 + path.sep + '*.vmt',dst2)
+	shutil.copy(src2 + path.sep + '*.vmt',dst2)
 	print('Finished executing')	
 
-
+# Quarter-Build System - Asset Management Class
+# v0.131229 by Wade Harkins <vdtdev@gmail.com>
+# ---------------------------------------------
+# Provides asset management capabilities get and put
 class asset_management:
 	""" Asset management functionality (get/put/backup, etc) """
 	def __init__(self,config,command):
 		if command in __commands__:
 			self._mode_=command
+		self._args_=__arguments__["args"]
+		self._config_=config
 		err=0;
 		if not config.setting('scrsrc')==None:
 			print "Asset source path not defined. (Expected value for scrsrc in qlbs.ini)"
@@ -91,8 +127,35 @@ class asset_management:
 		if err!=0:
 			print "Terminating."
 			exit(err)
-			
 	
+	
+	def execute(self):
+		""" Execute managment command """
+		if self._mode_==['get','assets']:
+			self.get_assets
+		if self._mode_==['put','assets']:
+			self.put_assets
+		
+	
+	def determine_path(self):
+		""" Determine the next available parts folder """
+		ti = time.localtime
+		tentative_name = str(ti.tm_year) + str(ti.tm_mon) + str(ti.tm_mday)
+		original_name=tentative_name
+		counter=1
+		name_decided = False
+		while not name_decided:
+			name_decided = path.exists(self._config_.setting("scrdst") +
+									   path.sep + tentative_name)
+			if name_decided:
+				tentative_name=original_name + '-' + str(counter)
+				counter+=1
+		return tentative_name
+	
+	def get_assets(self):
+		""" Copy assets from script, resource, media and cfg from the 
+			binary folder to a folder in the local parts folder """
+			
 if __name__=="__main__":
 	print("[QLBS]")
 	__startup__()
