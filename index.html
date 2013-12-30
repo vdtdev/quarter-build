@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="Quarter-Build : Valve SOURCE mod content build system" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>Quarter-Build</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/vdtdev/quarter-build">View on GitHub</a>
+
+          <h1 id="project_title">Quarter-Build</h1>
+          <h2 id="project_tagline">Valve SOURCE mod content build system</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/vdtdev/quarter-build/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/vdtdev/quarter-build/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a name="quarter-life-build-system" class="anchor" href="#quarter-life-build-system"><span class="octicon octicon-link"></span></a>Quarter-Life Build System</h1>
+
+<h3>
+<a name="contents" class="anchor" href="#contents"><span class="octicon octicon-link"></span></a>Contents</h3>
+
+<blockquote>
+<ol>
+<li>
+<a href="#overview">Overview</a> <br>1.1 <a href="#files">Files</a> <br>1.2 <a href="#modules">Required Modules</a>
+</li>
+<li>
+<a href="#qlbuild">QLBuild</a> <br>2.1 <a href="#qlbusage">Usage</a> <br>2.2 <a href="#qlbclasses">Classes</a>
+</li>
+<li>QLQC (TODO)</li>
+<li><a href="https://github.com/vdtdev/quarter-build/wiki">Wiki</a></li>
+</ol>
+</blockquote>
+
+<p><a name="overview"></a></p>
+
+<h2>
+<a name="overview" class="anchor" href="#overview"><span class="octicon octicon-link"></span></a>Overview</h2>
+
+<p>Quarter-Life Build is a Python based build system for Source engine mods. It automates the process of building models, materials, and managing multiple revisions of script and resource files.</p>
+
+<h3>
+<a name="files" class="anchor" href="#files"><span class="octicon octicon-link"></span></a>Files</h3>
+
+<p><a name="files"></a></p>
+
+<blockquote>
+<ul>
+<li>  <code>qbe.py</code> v0.20 of main qlb module (Left for reference, obsolete)</li>
+<li>  <code>qlbs.ini</code> Contains definitions of the required path variables</li>
+<li> <code>qlbuild.py</code>- v0.2x of main qlb module, contains multiple classes (current)</li>
+<li>  <code>qlqc.py</code> - QL QC Model compiler tool</li>
+<li>  <code>cltest.py</code> - Initial implementation of QLQC (left for reference, obsolete)</li>
+</ul>
+</blockquote>
+
+<h3>
+<a name="python-modules-required" class="anchor" href="#python-modules-required"><span class="octicon octicon-link"></span></a>Python Modules Required</h3>
+
+<blockquote>
+<ul>
+<li><code>textwrap</code></li>
+<li><code>os</code></li>
+<li><code>string</code></li>
+<li><code>time</code></li>
+<li><code>argparse</code></li>
+<li><code>sys</code></li>
+</ul>
+</blockquote>
+
+<p><a name="qlbuild"></a></p>
+
+<h2>
+<a name="qlbuild" class="anchor" href="#qlbuild"><span class="octicon octicon-link"></span></a>QLBuild</h2>
+
+<p><a name="qlbusage"></a></p>
+
+<h3>
+<a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
+
+<blockquote>
+<pre><code>qlbuild.py [-h] [--args {U,C,N,A}] action target
+</code></pre>
+</blockquote>
+
+<p><strong>Arguments</strong></p>
+
+<table>
+<thead><tr>
+<th align="left">Argument</th>
+<th align="center">Optional</th>
+<th align="left">Values</th>
+<th align="left">Help</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="left">action</td>
+<td align="center"><em>no</em></td>
+<td align="left">get, set, build</td>
+<td align="left">Specifies the type of action to perform</td>
+</tr>
+<tr>
+<td align="left">target</td>
+<td align="center"><em>no</em></td>
+<td align="left">assets, materials</td>
+<td align="left">Specifies the content type that the action is to be performed on</td>
+</tr>
+<tr>
+<td align="left">--args [a]</td>
+<td align="center"><em>yes</em></td>
+<td align="left"><em>see <a href="qlbargs">args</a></em></td>
+<td align="left">Target-specific options</td>
+</tr>
+</tbody>
+</table><p><a name="qlbargs"></a></p>
+
+<p><strong>Target Specific Arguments</strong></p>
+
+<table>
+<thead><tr>
+<th align="center">Argument</th>
+<th align="left">Targets</th>
+<th align="left">Actions</th>
+<th align="left">Help</th>
+</tr></thead>
+<tbody>
+<tr>
+<td align="center">U</td>
+<td align="left">materials, assets</td>
+<td align="left">get, put</td>
+<td align="left">Copy updated files only</td>
+</tr>
+<tr>
+<td align="center">C</td>
+<td align="left">materials, assets</td>
+<td align="left">get, put</td>
+<td align="left">Copy modified files only</td>
+</tr>
+<tr>
+<td align="center">N</td>
+<td align="left">materials, assets</td>
+<td align="left">get, put</td>
+<td align="left">Copy new files only</td>
+</tr>
+<tr>
+<td align="center">A</td>
+<td align="left">materials, assets</td>
+<td align="left">get, put</td>
+<td align="left">Copy all files (default)</td>
+</tr>
+</tbody>
+</table><p><a name="qlbclasses"></a></p>
+
+<h3>
+<a name="classes" class="anchor" href="#classes"><span class="octicon octicon-link"></span></a>Classes</h3>
+
+<ul>
+<li>
+<strong>asset_management</strong>
+&gt; Handles all actions performed targetting <code>assets</code> </li>
+<li>
+<strong>config</strong>
+&gt; Loads qlb .ini file and provides access to the variables defined within it</li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">Quarter-Build maintained by <a href="https://github.com/vdtdev">vdtdev</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
