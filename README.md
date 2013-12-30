@@ -4,13 +4,10 @@ Quarter-Life Build System
 
 ### Contents ###
 >
-1. [Overview](#overview)
-- [Files](#files)
-- [Required Modules](#modules)
-2. [QLBuild](#qlbuild)
-- [Usage](#qlbusage)
-- [Classes](#qlbclasses)
+1. [Overview](#overview) <br>1.1 [Files](#files) <br>1.2 [Required Modules](#modules)
+2. [QLBuild](#qlbuild) <br>2.1 [Usage](#qlbusage) <br>2.2 [Classes](#qlbclasses)
 3. [QLQC](#qlqc)
+
 
 <a name="overview"></a>
 
