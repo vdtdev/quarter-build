@@ -16,10 +16,17 @@ indent_mode=2
 [project]
 name=quarter-build
 base_path=F:\\dev\\python\\quarter-build
+description=Build system for Source Mods
+file_patterns=*.py\;;*.ini;
 
 [long line marker]
 long_line_behaviour=1
 long_line_column=72
 
 [files]
-current_page=-1
+current_page=4
+FILE_NAME_0=0;Python;0;16;1;1;0;F%3A%5Cdev%5Cpython%5Cquarter-build%5Ccltest.py;0;4
+FILE_NAME_1=0;Python;0;16;1;1;0;F%3A%5Cdev%5Cpython%5Cquarter-build%5Cqbe.py;0;4
+FILE_NAME_2=268;Conf;0;16;1;1;0;F%3A%5Cdev%5Cpython%5Cquarter-build%5Cqlbs.ini;0;4
+FILE_NAME_3=293;Python;0;16;1;1;0;F%3A%5Cdev%5Cpython%5Cquarter-build%5Cqlbuild.py;0;4
+FILE_NAME_4=397;Python;0;16;1;1;0;F%3A%5Cdev%5Cpython%5Cquarter-build%5Cqlqc.py;0;4
