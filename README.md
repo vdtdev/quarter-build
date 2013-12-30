@@ -5,11 +5,11 @@ Quarter-Life Build System
 ### Contents ###
 >
 1. [Overview](#overview)
->> - [Files](#files)
->> - [Required Modules](#modules)
+- [Files](#files)
+- [Required Modules](#modules)
 2. [QLBuild](#qlbuild)
->> - [Usage](#qlbusage)
->> - [Classes](#qlbclasses)
+- [Usage](#qlbusage)
+- [Classes](#qlbclasses)
 3. [QLQC](#qlqc)
 
 <a name="overview"></a>
@@ -69,9 +69,9 @@ A | materials, assets | get, put | Copy all files (default)
 <a name="qlbclasses"/>
 
 ###Classes###
-- ####asset_management###
+- __asset_management__
 > Handles all actions performed targetting `assets` 
-- ###config###
+- __config__
 > Loads qlb .ini file and provides access to the variables defined within it
 
 
