@@ -35,7 +35,8 @@ def __startup__():
 						help='Content type to target (assets, materials)')
 	parser.add_argument('--args',dest='args',choices=__asset_args__,
 						help='Arguments to pass to tool',action='store',required=False)
-	parser.add_argument('--path',dest='matpath',help='Material folder to build',required=False)
+	parser.add_argument('--path',dest='matpath',help='Material folder to build',
+						required=False,default='*nopath*')
 	print(parser.description)
 	# exit if no arguments were passed, or just one
 	if len(sys.argv)==1 or len(sys.argv)==2:
@@ -97,18 +98,24 @@ class config:
 
 
 def build_materials(cfg,spath):
-	""" implements the functionality of build_materials.bat """
+	""" implements the functionality of build_materials.bat 
+		cfg - instance of Config with qlbs.ini loaded
+		spath - sub folder of material source folder to copy from
+	"""
 	mat_src = cfg.setting('matsrc')
 	dst_root = cfg.setting('matdst')
-	if dst_root[len(dst_root)-1]!=path.sep:
-		dst2 = string.join([dst_root, spath],path.sep)
-	else:
-		dst2=dst_root + path.sep + spath
-	if mat_src[len(mat_src)-1]!=path.sep:
-		src2 = string.join([mat_src, spath],path.sep)
-	else:
-		src2 = mat_src + path.sep + spath
 	
+	# if no subpath is specified, use the root
+	if not spath=='*nopath*':
+		if dst_root[len(dst_root)-1]!=path.sep:
+			dst2 = string.join([dst_root, spath],path.sep)
+		else:
+			dst2=dst_root + path.sep + spath
+		if mat_src[len(mat_src)-1]!=path.sep:
+			src2 = string.join([mat_src, spath],path.sep)
+		else:
+			src2 = mat_src + path.sep + spath
+		
 	os.system('mkdir ' + dst2)
 	os.system('mkdir ' + src2)
 	
