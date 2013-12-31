@@ -6,7 +6,11 @@ import argparse
 import string
 import time
 import sys
+import shutil
+import fnmatch
 from os import path
+import os
+
 # command names from batch version
 __commands__=[['get','materials'],['get','assets'],['put','materials'],
 				['put','assets'],['build','materials']]
@@ -15,7 +19,7 @@ __targets__=['materials','assets']
 __asset_args__=['U','C','N','A']
 __parser__ = None
 __arguments__=None
-cfg = None
+__cfg__ = None
 
 def __startup__():
 	parser = argparse.ArgumentParser(description='Quarter-Life Build System (QLBS) v0.2',
@@ -31,6 +35,8 @@ def __startup__():
 						help='Content type to target (assets, materials)')
 	parser.add_argument('--args',dest='args',choices=__asset_args__,
 						help='Arguments to pass to tool',action='store',required=False)
+	parser.add_argument('--path',dest='matpath',help='Material folder to build',required=False)
+	print(parser.description)
 	# exit if no arguments were passed, or just one
 	if len(sys.argv)==1 or len(sys.argv)==2:
 		parser.print_help()
@@ -42,29 +48,30 @@ def __startup__():
 
 def run_tool(arg,args):
 	""" Execute tool indicated in the commandline, or show help """
-	cfg=config('qlbs.ini')
+	__cfg__=config('qlbs.ini')
 	__arguments__=arg
 	if arg['target']=='materials':
 		# Material actions
 		if arg['action']=='build':
 			# Build materials
-			build_materials(arg['tool_args'])
+			build_materials(__cfg__,arg['matpath'])
 			exit(0)
 			
 	if arg['target']=='assets':
 		cmd = [arg['action'],arg['target']]
 		# Asset actions
 		if arg['action']=='get':
-			tool = asset_management(cfg,cmd)
+			tool = asset_management(__cfg__,cmd)
 			tool.execute
 			exit(0)
 		if arg['action']=='put':
-			tool = asset_management(cfg,cmd)
+			tool = asset_management(__cfg__,cmd)
 			tool.execute
 			exit(0)
 		print ("Invalid action provided")
 		exit(0)
 
+# INI Config File Parser
 class config:
 	""" Read a dictionary of settings from a file on disk """
 	def __init__(self,cfgfile):
@@ -89,21 +96,29 @@ class config:
 		return self.__props__[prop]
 
 
-def build_materials(path):
+def build_materials(cfg,spath):
 	""" implements the functionality of build_materials.bat """
 	mat_src = cfg.setting('matsrc')
 	dst_root = cfg.setting('matdst')
-	if dst_root[len(dst_root)-1]!='\\':
-		dst_root = string.join([dst_root, path],'\\')
-	if mat_src[len(mat_src)-1]!='\\':
-		mat_src = string.join([mat_src, path],'\\')
-	dst2 = dst_root + path
-	src2 = mat_src + path
+	if dst_root[len(dst_root)-1]!=path.sep:
+		dst2 = string.join([dst_root, spath],path.sep)
+	else:
+		dst2=dst_root + path.sep + spath
+	if mat_src[len(mat_src)-1]!=path.sep:
+		src2 = string.join([mat_src, spath],path.sep)
+	else:
+		src2 = mat_src + path.sep + spath
+	
 	os.system('mkdir ' + dst2)
 	os.system('mkdir ' + src2)
-	shutil.copy(mat_src + '*.vmt',dst_root)
-	shutil.copy(src2 + path.sep + '*.vmt',dst2)
-	shutil.copy(src2 + path.sep + '*.vmt',dst2)
+	
+	src_files = os.listdir(src2)
+	
+	for fn in src_files:
+		if fnmatch.fnmatch(fn,'*.vmt') or fnmatch.fnmatch(fn,'*.vtf'):
+			shutil.copy(src2 +path.sep+ fn,dst2)
+			print('Copying '+fn+'...')
+	
 	print('Finished executing')	
 
 # Quarter-Build System - Asset Management Class
