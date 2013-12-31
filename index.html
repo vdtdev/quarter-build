@@ -72,6 +72,8 @@
 </ul>
 </blockquote>
 
+<p><a name="modules"></a></p>
+
 <h3>
 <a name="python-modules-required" class="anchor" href="#python-modules-required"><span class="octicon octicon-link"></span></a>Python Modules Required</h3>
 
@@ -83,6 +85,8 @@
 <li><code>time</code></li>
 <li><code>argparse</code></li>
 <li><code>sys</code></li>
+<li><code>shutil</code></li>
+<li><code>fnmatch</code></li>
 </ul>
 </blockquote>
 
@@ -97,7 +101,7 @@
 <a name="usage" class="anchor" href="#usage"><span class="octicon octicon-link"></span></a>Usage</h3>
 
 <blockquote>
-<pre><code>qlbuild.py [-h] [--args {U,C,N,A}] action target
+<pre><code>qlbuild.py [-h] [--args {U,C,N,A}] [--path PATH] action target
 </code></pre>
 </blockquote>
 
@@ -128,6 +132,12 @@
 <td align="center"><em>yes</em></td>
 <td align="left"><em>see <a href="qlbargs">args</a></em></td>
 <td align="left">Target-specific options</td>
+</tr>
+<tr>
+<td align="left">--path [p]</td>
+<td align="center"><em>yes</em></td>
+<td align="left">relative path</td>
+<td align="left">Relative path of a subfolder in the material source directory</td>
 </tr>
 </tbody>
 </table><p><a name="qlbargs"></a></p>
