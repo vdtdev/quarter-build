@@ -24,6 +24,8 @@ Quarter-Life Build is a Python based build system for Source engine mods. It aut
 -   `qlqc.py` - QL QC Model compiler tool
 -   `cltest.py` - Initial implementation of QLQC (left for reference, obsolete)
 
+<a name="modules"/>
+
 ###Python Modules Required###
 >
 + `textwrap`

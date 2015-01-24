@@ -1,5 +1,5 @@
 """ Quarter-Life Build
-	v0.2.20131229
+	v0.2.20150124
 	by Wade Harkins <vdtdev@gmail.com>"""
 import textwrap
 import argparse
@@ -57,9 +57,15 @@ def run_tool(arg,args):
 			# Build materials
 			build_materials(__cfg__,arg['matpath'])
 			exit(0)
+		if arg['action']=='get':
+			# Build materials
+			get_materials(__cfg__,arg['matpath'])
+			exit(0)
 			
 	if arg['target']=='assets':
-		cmd = [arg['action'],arg['target']]
+		cmd = {
+		"action":arg['action'],"target":arg['target'],
+		"args":arg["args"]}
 		# Asset actions
 		if arg['action']=='get':
 			tool = asset_management(__cfg__,cmd)
@@ -128,6 +134,39 @@ def build_materials(cfg,spath):
 	
 	print('Finished executing')	
 
+def get_materials(cfg,spath):
+	""" implements the functionality of build_materials.bat 
+		cfg - instance of Config with qlbs.ini loaded
+		spath - sub folder of material source folder to copy from
+	"""
+	mat_src = cfg.setting('matdst')
+	dst_root = cfg.setting('matsrc')
+	dst = dst_root
+	src = mat_src
+	
+	# if no subpath is specified, use the root
+	if not spath=='*nopath*':
+		if dst_root[len(dst_root)-1]!=path.sep:
+			dst2 = string.join([dst_root, spath],path.sep)
+		else:
+			dst2=dst_root + path.sep + spath
+		if mat_src[len(mat_src)-1]!=path.sep:
+			src2 = string.join([mat_src, spath],path.sep)
+		else:
+			src2 = mat_src + path.sep + spath
+		
+	os.system('mkdir ' + dst)
+	os.system('mkdir ' + src)
+	
+	src_files = os.listdir(src)
+	
+	for fn in src_files:
+		if fnmatch.fnmatch(fn,'*.vmt') or fnmatch.fnmatch(fn,'*.vtf'):
+			shutil.copy(src +path.sep+ fn,dst)
+			print('Copying '+fn+'...')
+	
+	print('Finished executing')	
+
 # Quarter-Build System - Asset Management Class
 # v0.131229 by Wade Harkins <vdtdev@gmail.com>
 # ---------------------------------------------
@@ -135,15 +174,18 @@ def build_materials(cfg,spath):
 class asset_management:
 	""" Asset management functionality (get/put/backup, etc) """
 	def __init__(self,config,command):
+		#print(config)
+		#print(command)
+		#print(__arguments__)
 		if command in __commands__:
 			self._mode_=command
-		self._args_=__arguments__["args"]
+		self._args_=["args"]
 		self._config_=config
 		err=0;
-		if not config.setting('scrsrc')==None:
+		if config.setting('scrsrc')==None:
 			print "Asset source path not defined. (Expected value for scrsrc in qlbs.ini)"
 			err+=1
-		if not config.setting('scrbackup')==None:
+		if config.setting('scrbackup')==None:
 			print "Asset backup path not defined. (Expected value for scrbackup in qlbs.ini"
 			err+=10
 		if err!=0:
@@ -174,10 +216,38 @@ class asset_management:
 				counter+=1
 		return tentative_name
 	
+	def working_asset_paths(self):
+		""" Dictionary of the working paths for script, config, and resource assets """
+		scrsrc = self._config_["scrsrc"]
+		return {"scr": scrsrc + path.sep + "scripts", "cfg": scrsrc + path.sep + "cfg", "res": scrsrc + "resource}
+	
 	def get_assets(self):
 		""" Copy assets from script, resource, media and cfg from the 
 			binary folder to a folder in the local parts folder """
-			
+		dst_path = self._config_["scrsrc"]
+	
+		scr_files = os.listdir(self._config_["buildroot"] + path.sep + "scripts")
+		cfg_files = os.listdir(self._config_["buildroot"] + path.sep + "cfg")
+		res_files = os.listdir(self._config_["buildroot"] + path.sep + "resource")
+		
+		scr_dst = self.working_asset_paths()["scr"]
+		cfg_dst = self.working_asset_paths()["cfg"]
+		res_dst = self.working_asset_paths()["res"]
+		
+		
+		os.system('mkdir ' + dst)
+		os.system('mkdir ' + cfg_files)
+		os.system('mkdir ' + src_files)
+		
+		print("Coping assets... " + backup_path)
+	
+		for fn in scr_files:
+			shutil.copy(scr_files +path.sep+ fn,backup_path)
+				print('Copying script '+fn+'...')
+		for fn in cfg_files:
+			shutil.copy(cfg_files +path.sep+ fn,backup_path)
+				print('Copying script '+fn+'...')
+		
 if __name__=="__main__":
 	print("[QLBS]")
 	__startup__()
