@@ -63,17 +63,18 @@ def run_tool(arg,args):
 			exit(0)
 			
 	if arg['target']=='assets':
-		cmd = {
+		command = [arg['action'],arg['target']]
+		arguments = {
 		"action":arg['action'],"target":arg['target'],
 		"args":arg["args"]}
 		# Asset actions
 		if arg['action']=='get':
-			tool = asset_management(__cfg__,cmd)
+			tool = asset_management(__cfg__,command,arguments)
 			tool.execute
 			exit(0)
 		if arg['action']=='put':
-			tool = asset_management(__cfg__,cmd)
-			tool.execute
+			tool = asset_management(__cfg__,command,arguments)
+			tool.execute()
 			exit(0)
 		print ("Invalid action provided")
 		exit(0)
@@ -173,15 +174,15 @@ def get_materials(cfg,spath):
 # Provides asset management capabilities get and put
 class asset_management:
 	""" Asset management functionality (get/put/backup, etc) """
-	def __init__(self,config,command):
+	def __init__(self,config,command,args):
 		#print(config)
 		#print(command)
 		#print(__arguments__)
 		if command in __commands__:
 			self._mode_=command
-		self._args_=["args"]
+		self._args_=args
 		self._config_=config
-		err=0;
+		err=0
 		if config.setting('scrsrc')==None:
 			print "Asset source path not defined. (Expected value for scrsrc in qlbs.ini)"
 			err+=1
@@ -197,8 +198,11 @@ class asset_management:
 		""" Execute managment command """
 		if self._mode_==['get','assets']:
 			self.get_assets
+			return 0
 		if self._mode_==['put','assets']:
 			self.put_assets
+			return 0
+		print("Invalid action.")
 		
 	
 	def determine_path(self):
@@ -208,7 +212,7 @@ class asset_management:
 		original_name=tentative_name
 		counter=1
 		name_decided = False
-		while not name_decided:
+		while not name_decided and counter < 45:
 			name_decided = path.exists(self._config_.setting("scrdst") +
 									   path.sep + tentative_name)
 			if name_decided:
@@ -218,17 +222,18 @@ class asset_management:
 	
 	def working_asset_paths(self):
 		""" Dictionary of the working paths for script, config, and resource assets """
-		scrsrc = self._config_["scrsrc"]
+		scrsrc = self._config_.setting("scrsrc")
 		return {"scr": scrsrc + path.sep + "scripts", "cfg": scrsrc + path.sep + "cfg", "res": scrsrc + path.sep + "resource"}
 	
 	def get_assets(self):
 		""" Copy assets from script, resource, media and cfg from the 
 			binary folder to a folder in the local parts folder """
-		dst_path = self._config_["scrsrc"]
+		
+		dst_path = self._config_.setting("scrsrc")
 	
-		scr_files = os.listdir(self._config_["buildroot"] + path.sep + "scripts")
-		cfg_files = os.listdir(self._config_["buildroot"] + path.sep + "cfg")
-		res_files = os.listdir(self._config_["buildroot"] + path.sep + "resource")
+		scr_files = os.listdir(self._config_.setting("buildroot") + path.sep + "scripts")
+		cfg_files = os.listdir(self._config_.setting("buildroot") + path.sep + "cfg")
+		res_files = os.listdir(self._config_.setting("buildroot") + path.sep + "resource")
 		
 		scr_dst = self.working_asset_paths()["scr"]
 		cfg_dst = self.working_asset_paths()["cfg"]
@@ -239,16 +244,18 @@ class asset_management:
 		os.system('mkdir ' + cfg_dst)
 		os.system('mkdir ' + res_dst)
 		
-		print("Coping assets... " + backup_path)
+		print("Coping assets... " + scr_dst)
 	
 		for fn in scr_files:
-			shutil.copy(scr_files +path.sep+ fn,scr_dst)
-			print("Copying script "+fn+"...")
+			shutil.copy(scr_files + path.sep + fn,scr_dst)
+			print("Copying script "+ fn +"...")
+		print("Coping assets... " + cfg_dst)
 		for fn in cfg_files:
-			shutil.copy(cfg_files +path.sep+ fn,cfg_dst)
+			shutil.copy(cfg_files + path.sep + fn,cfg_dst)
 			print("Copying script "+fn+"...")
-		for fn in rres_files:
-			shutil.copy(res_files +path.sep+ fn,res_dst)
+		print("Coping assets... " + res_dst)
+		for fn in res_files:
+			shutil.copy(res_files + path.sep + fn,res_dst)
 			print("Copying script " + fn + "...")
 
 if __name__=="__main__":
