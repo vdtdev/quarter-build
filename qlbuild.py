@@ -219,7 +219,7 @@ class asset_management:
 	def working_asset_paths(self):
 		""" Dictionary of the working paths for script, config, and resource assets """
 		scrsrc = self._config_["scrsrc"]
-		return {"scr": scrsrc + path.sep + "scripts", "cfg": scrsrc + path.sep + "cfg", "res": scrsrc + "resource}
+		return {"scr": scrsrc + path.sep + "scripts", "cfg": scrsrc + path.sep + "cfg", "res": scrsrc + path.sep + "resource"}
 	
 	def get_assets(self):
 		""" Copy assets from script, resource, media and cfg from the 
@@ -235,19 +235,22 @@ class asset_management:
 		res_dst = self.working_asset_paths()["res"]
 		
 		
-		os.system('mkdir ' + dst)
-		os.system('mkdir ' + cfg_files)
-		os.system('mkdir ' + src_files)
+		os.system('mkdir ' + scr_dst)
+		os.system('mkdir ' + cfg_dst)
+		os.system('mkdir ' + res_dst)
 		
 		print("Coping assets... " + backup_path)
 	
 		for fn in scr_files:
-			shutil.copy(scr_files +path.sep+ fn,backup_path)
-				print('Copying script '+fn+'...')
+			shutil.copy(scr_files +path.sep+ fn,scr_dst)
+			print("Copying script "+fn+"...")
 		for fn in cfg_files:
-			shutil.copy(cfg_files +path.sep+ fn,backup_path)
-				print('Copying script '+fn+'...')
-		
+			shutil.copy(cfg_files +path.sep+ fn,cfg_dst)
+			print("Copying script "+fn+"...")
+		for fn in rres_files:
+			shutil.copy(res_files +path.sep+ fn,res_dst)
+			print("Copying script " + fn + "...")
+
 if __name__=="__main__":
 	print("[QLBS]")
 	__startup__()
